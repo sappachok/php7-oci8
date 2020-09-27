@@ -15,6 +15,8 @@ COPY docker-php.conf /etc/apache2/conf-enabled/docker-php.conf
 RUN printf "log_errors = On \nerror_log = /dev/stderr\n" > /usr/local/etc/php/conf.d/php-logs.ini
 
 RUN a2enmod rewrite
+RUN a2enmod ssl
+RUN a2ensite default-ssl
 
 # Oracle instantclient
 ADD ./instantclient/12.2.0.1.0/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
