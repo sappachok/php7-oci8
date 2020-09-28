@@ -36,9 +36,10 @@ RUN echo "ServerName localhost" >> /etc/apache2/conf-available/localhost.conf &&
 			&& sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/apache2/ssl/apache2.crt|g" /etc/apache2/sites-available/default-ssl.conf \
 			&& sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/apache2/ssl/apache2.key|g" /etc/apache2/sites-available/default-ssl.conf \
 
-RUN a2enmod rewrite
 RUN a2enmod ssl
 RUN a2ensite default-ssl
+
+RUN a2enmod rewrite
 
 # Oracle instantclient
 ADD ./instantclient/12.2.0.1.0/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
