@@ -34,7 +34,7 @@ RUN echo "ServerName localhost" >> /etc/apache2/conf-available/localhost.conf &&
 
 # Install SSL certificate
 			&& sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/apache2/ssl/apache2.crt|g" /etc/apache2/sites-available/default-ssl.conf \
-			&& sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/apache2/ssl/apache2.key|g" /etc/apache2/sites-available/default-ssl.conf \
+			&& sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/apache2/ssl/apache2.key|g" /etc/apache2/sites-available/default-ssl.conf
 
 RUN a2enmod ssl
 RUN a2ensite default-ssl
