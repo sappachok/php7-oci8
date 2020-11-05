@@ -65,5 +65,3 @@ RUN apt-get install nano -y
 RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
 
 EXPOSE 80
-
-RUN curl http://localhost/phpinfo.php
