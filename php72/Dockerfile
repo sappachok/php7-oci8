@@ -69,7 +69,7 @@ RUN echo "export ORACLE_HOME=/usr/local/instantclient" >> /etc/apache2/envvars
 RUN echo "LD_LIBRARY_PATH=/usr/local/instantclient:\$LD_LIBRARY_PATH" >> /etc/environment
 
 RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
-RUN echo "<?php echo 'Client Version: '' . @oci_client_version(); ?>" > /var/www/html/ocitest.php
+RUN echo "<?php echo 'Client Version: ' . oci_client_version(); ?>" > /var/www/html/ocitest.php
 
 RUN echo "service apache2 restart"
 
