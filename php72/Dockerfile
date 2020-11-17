@@ -77,3 +77,4 @@ RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
 
 EXPOSE 80
+EXPOSE 443
