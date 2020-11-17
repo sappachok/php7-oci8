@@ -73,6 +73,7 @@ RUN echo "<?php echo 'Client Version: '' . @oci_client_version(); ?>" > /var/www
 
 RUN echo "service apache2 restart"
 
+RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
 
 EXPOSE 80
