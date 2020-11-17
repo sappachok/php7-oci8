@@ -65,5 +65,7 @@ RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
 RUN apt-get install nano -y
 
 RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
+RUN echo "<?php echo 'Client Version: '' . oci_client_version(); ?>" > /var/www/html/ocitest.php
+RUN echo "curl http://localhost/ocitest.php"
 
 EXPOSE 80
