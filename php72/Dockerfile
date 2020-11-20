@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:7.3-apache
 
 RUN apt-get update && apt-get install -y \
         unzip \
@@ -40,9 +40,6 @@ RUN a2enmod ssl
 RUN a2ensite default-ssl
 
 RUN a2enmod rewrite
-
-RUN apt-get update
-RUN apt-get install -y php72w-ldap
 
 RUN a2enmod ldap
 
