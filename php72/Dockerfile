@@ -41,6 +41,8 @@ RUN a2ensite default-ssl
 
 RUN a2enmod rewrite
 
+RUN apt-get update && apt-get install -y php-ldap
+
 RUN a2enmod ldap
 
 # Oracle instantclient
