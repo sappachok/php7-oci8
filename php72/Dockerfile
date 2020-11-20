@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
         libjpeg62-turbo-dev \
         libpng-dev \
         libaio1 \
-        php5-ldap \
     && docker-php-ext-install -j$(nproc) iconv gettext \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd
@@ -42,7 +41,7 @@ RUN a2ensite default-ssl
 
 RUN a2enmod rewrite
 
-RUN php5enmod ldap
+RUN a2enmod ldap
 
 # Oracle instantclient
 ADD ./instantclient/12.2.0.1.0/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
