@@ -44,7 +44,20 @@ RUN a2enmod rewrite
 # RUN apt-get update
 # RUN apt-get install -y php-ldap
 
-RUN a2enmod ldap
+
+###########################################################################
+# LDAP:
+###########################################################################
+
+ARG INSTALL_LDAP=true
+
+RUN if [ ${INSTALL_LDAP} = true ]; then \
+    apt-get install -y libldap2-dev && \
+    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
+    docker-php-ext-install ldap \
+;fi
+
+# RUN a2enmod ldap
 
 # Oracle instantclient
 ADD ./instantclient/12.2.0.1.0/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
