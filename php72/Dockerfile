@@ -79,7 +79,7 @@ RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"'
 
 RUN pecl channel-update pecl.php.net
 
-RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.1.8
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
 RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
 
 RUN apt-get install nano -y
@@ -92,6 +92,12 @@ RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
 RUN echo "<?php echo 'Client Version: ' . oci_client_version(); ?>" > /var/www/html/ocitest.php
 
 RUN echo "service apache2 restart"
+
+RUN php -v
+
+RUN ldconfig -v
+
+RUN ldd /usr/local/lib/php/extensions/no-debug-non-zts-20190902/oci8.so
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
