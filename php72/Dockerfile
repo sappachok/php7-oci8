@@ -6,6 +6,18 @@ RUN apt-get update && apt-get install -y \
         libjpeg62-turbo-dev \
         libpng-dev \
         libaio1 \
+	libfreetype6-dev \
+        libssl-dev \
+        libmcrypt-dev \
+        zlib1g-dev \
+        libxml2-dev \
+        libonig-dev \
+        zip \
+        curl \
+        libmemcached-dev \
+        build-essential \
+        libaio1 \
+        libzip-dev \
     && docker-php-ext-install -j$(nproc) iconv gettext \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd
@@ -97,7 +109,7 @@ RUN php -v
 
 RUN ldconfig -v
 
-#RUN ldd /usr/local/lib/php/extensions/no-debug-non-zts-20190902/oci8.so
+RUN ldd /usr/local/lib/php/extensions/no-debug-non-zts-20170718/oci8.so
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
