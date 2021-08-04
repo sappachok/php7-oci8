@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install zip \
     && docker-php-ext-install -j$(nproc) iconv gettext \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd 
+    && docker-php-ext-install -j$(nproc) gd
 
 # Install zip
 RUN apt-get update && \
