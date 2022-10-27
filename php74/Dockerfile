@@ -98,11 +98,12 @@ RUN cp /tmp/instantclient-basic-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/cl
 RUN cp /tmp/instantclient-sdk-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
 
 RUN cd /usr/lib/oracle/21.1/client64
+RUN ls
 
 RUN unzip instantclient-basic-linux.x64-21.1.0.0.0.zip
-RUN sudo unzip instantclient-sdk-linux.x64-21.1.0.0.0.zip
+RUN unzip instantclient-sdk-linux.x64-21.1.0.0.0.zip
 
-RUN sudo mv instantclient_21_1 lib
+RUN mv instantclient_21_1 lib
 RUN cd /usr/lib/oracle/21.1/client64/lib/
 RUN ln -s libclntsh.so.21.1 libclntsh.so
 RUN ln -s libocci.so.21.1 libocci.so
