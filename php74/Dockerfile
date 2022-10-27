@@ -86,9 +86,9 @@ RUN if [ ${INSTALL_LDAP} = true ]; then \
 # Oracle instantclient
 
 # Oracle instantclient
-ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
+ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip /tmp/
+ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip /tmp/
+ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip /tmp/
 
 RUN mkdir /usr/lib/oracle
 RUN mkdir /usr/lib/oracle/21.1
