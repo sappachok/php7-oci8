@@ -100,6 +100,8 @@ RUN cp /tmp/instantclient-sdk-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/clie
 RUN cd /usr/lib/oracle/21.1/client64
 RUN ls
 
+WORKDIR /usr/lib/oracle/21.1/client64
+
 RUN unzip instantclient-basic-linux.x64-21.1.0.0.0.zip
 RUN unzip instantclient-sdk-linux.x64-21.1.0.0.0.zip
 
