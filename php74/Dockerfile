@@ -116,8 +116,8 @@ RUN ldconfig
 
 RUN pecl channel-update pecl.php.net
 
-RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8
-# echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
+RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8
+RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8-2.2.0
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
