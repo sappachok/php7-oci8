@@ -79,56 +79,32 @@ RUN if [ ${INSTALL_LDAP} = true ]; then \
 # RUN a2enmod ldap
 
 # Oracle instantclient
-ADD ./instantclient/12.2.0.1.0/instantclient-basic-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/12.2.0.1.0/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/12.2.0.1.0/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
 
-RUN unzip /tmp/instantclient-basic-linux.x64-12.2.0.1.0.zip -d /usr/local/
-RUN unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/
-RUN unzip /tmp/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip -d /usr/local/
+RUN mkdir /usr/lib/oracle
+RUN mkdir /usr/lib/oracle/21.1
+RUN mkdir /usr/lib/oracle/21.1/client64
 
-RUN ln -s /usr/local/instantclient_12_2 /usr/local/instantclient
-RUN ln -s /usr/local/instantclient_12_2/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
-RUN ln -s /usr/local/instantclient_12_2/libocci.so.12.1 /usr/local/instantclient/libocci.so
-RUN ln -s /usr/local/instantclient_12_2/sqlplus /usr/bin/sqlplus
+RUN cp instantclient-basic-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
+RUN cp instantclient-sdk-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
 
-RUN LD_LIBRARY_PATH=/usr/local/instantclient/ php
+RUN /usr/lib/oracle/21.1/client64
 
-RUN sh -c echo '/usr/local/instantclient' > /etc/ld.so.conf.d/oracle-instantclient
+RUN unzip instantclient-basic-linux.x64-21.1.0.0.0.zip
+RUN sudo unzip instantclient-sdk-linux.x64-21.1.0.0.0.zip
 
-RUN echo 'export ORACLE_HOME=/usr/local/instantclient' >> /root/.bashrc
-RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"' >> /root/.bashrc
-RUN echo 'umask 002' >> /root/.bashrc
+RUN sudo mv instantclient_21_1 lib
+RUN cd /usr/lib/oracle/21.1/client64/lib/
+RUN ln -s libclntsh.so.21.1 libclntsh.so
+RUN ln -s libocci.so.21.1 libocci.so
 
-#RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"'
-
-RUN echo "LD_LIBRARY_PATH=\"/usr/local/instantclient\"" >> /etc/environment \
-    && echo "ORACLE_HOME=\"/usr/local/instantclient\"" >> /etc/environment
+RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf
 
 RUN ldconfig
-ENV LD_LIBRARY_PATH /usr/local/instantclient
 
 RUN pecl channel-update pecl.php.net
 
-RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
-RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
-
-RUN apt-get install nano -y
-
-RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient" >> /etc/apache2/envvars
-RUN echo "export ORACLE_HOME=/usr/local/instantclient" >> /etc/apache2/envvars
-RUN echo "LD_LIBRARY_PATH=/usr/local/instantclient:\$LD_LIBRARY_PATH" >> /etc/environment
-
-RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
-RUN echo "<?php echo 'Client Version: ' . oci_client_version(); ?>" > /var/www/html/ocitest.php
-
-RUN echo "service apache2 restart"
-
-RUN php -v
-
-RUN ldconfig -v
-
-RUN ldd /usr/local/lib/php/extensions/no-debug-non-zts-20170718/oci8.so
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8
+# echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
