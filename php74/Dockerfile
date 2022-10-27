@@ -85,22 +85,17 @@ RUN if [ ${INSTALL_LDAP} = true ]; then \
 
 # Oracle instantclient
 
-ENV ORA_CLIENT=instantclient-basic-linux.x64-21.1.0.0.0.zip
-ENV ORA_CLIENT_SDK=instantclient-sdk-linux.x64-21.1.0.0.0.zip
-ENV ORA_URL_PART=https://download.oracle.com/otn_software/linux/instantclient/211000
-
-RUN curl -O ${ORA_URL_PART}/${ORA_CLIENT} \
-    && curl -O ${ORA_URL_PART}/${ORA_CLIENT_SDK} \
-    #&& unzip /tmp/${ORA_CLIENT} \
-    #&& unzip /tmp/${ORA_CLIENT_SDK} \
-    #&& rm /tmp/${ORA_CLIENT} && rm ${ORA_CLIENT_SDK}
+# Oracle instantclient
+ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-12.2.0.1.0.zip /tmp/
+ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
+ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
 
 RUN mkdir /usr/lib/oracle
 RUN mkdir /usr/lib/oracle/21.1
 RUN mkdir /usr/lib/oracle/21.1/client64
 
-RUN cp instantclient-basic-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
-RUN cp instantclient-sdk-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
+RUN cp /tmp/instantclient-basic-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
+RUN cp /tmp/instantclient-sdk-linux.x64-21.1.0.0.0.zip /usr/lib/oracle/21.1/client64
 
 RUN cd /usr/lib/oracle/21.1/client64
 
