@@ -2,10 +2,11 @@ version: '3'
 services:
    php7-oci8:
       image: sappachok/php7-oci8
-      env_file:
-         - .env
+      #env_file:
+      #   - .env
       volumes:
-         - ${WWW_PATH}:/var/www/html
+         - ./www:/var/www/html
       ports:
-         - "8181:80"
+         - "7000:80"
+         - "7443:443"
 
