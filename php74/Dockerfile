@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM php:7.2-apache
-=======
 FROM php:7.4-apache
->>>>>>> origin/php74
 
 RUN apt-get update && apt-get install -y \
         unzip \
@@ -10,8 +6,6 @@ RUN apt-get update && apt-get install -y \
         libjpeg62-turbo-dev \
         libpng-dev \
         libaio1 \
-<<<<<<< HEAD
-=======
 	libfreetype6-dev \
         libssl-dev \
         libmcrypt-dev \
@@ -25,34 +19,20 @@ RUN apt-get update && apt-get install -y \
         libaio1 \
         libzip-dev \
     && docker-php-ext-install zip \
->>>>>>> origin/php74
     && docker-php-ext-install -j$(nproc) iconv gettext \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd
 
-<<<<<<< HEAD
-=======
 # Install zip
 RUN apt-get update && \
      apt-get install -y \
          libzip-dev \
          && docker-php-ext-install zip
 
->>>>>>> origin/php74
 COPY docker-php.conf /etc/apache2/conf-enabled/docker-php.conf
 
 RUN printf "log_errors = On \nerror_log = /dev/stderr\n" > /usr/local/etc/php/conf.d/php-logs.ini
 
-<<<<<<< HEAD
-RUN a2enmod rewrite
-
-# Oracle instantclient
-ADD ./instantclient/12.2.0.1.0/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/12.2.0.1.0/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
-ADD ./instantclient/12.2.0.1.0/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
-
-RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/
-=======
 # Fix warnings
 RUN echo "ServerName localhost" >> /etc/apache2/conf-available/localhost.conf && a2enconf localhost \
 
@@ -104,20 +84,10 @@ ADD ./instantclient/12.2.0.1.0/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
 ADD ./instantclient/12.2.0.1.0/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
 
 RUN unzip /tmp/instantclient-basic-linux.x64-12.2.0.1.0.zip -d /usr/local/
->>>>>>> origin/php74
 RUN unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/
 RUN unzip /tmp/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip -d /usr/local/
 
 RUN ln -s /usr/local/instantclient_12_2 /usr/local/instantclient
-<<<<<<< HEAD
-RUN ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
-RUN ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
-
-RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"' >> /root/.bashrc
-RUN echo 'umask 002' >> /root/.bashrc
-
-RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8
-=======
 RUN ln -s /usr/local/instantclient_12_2/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
 RUN ln -s /usr/local/instantclient_12_2/libocci.so.12.1 /usr/local/instantclient/libocci.so
 RUN ln -s /usr/local/instantclient_12_2/sqlplus /usr/bin/sqlplus
@@ -141,16 +111,10 @@ ENV LD_LIBRARY_PATH /usr/local/instantclient
 RUN pecl channel-update pecl.php.net
 
 RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
->>>>>>> origin/php74
 RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
 
 RUN apt-get install nano -y
 
-<<<<<<< HEAD
-RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
-
-EXPOSE 80
-=======
 RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient" >> /etc/apache2/envvars
 RUN echo "export ORACLE_HOME=/usr/local/instantclient" >> /etc/apache2/envvars
 RUN echo "LD_LIBRARY_PATH=/usr/local/instantclient:\$LD_LIBRARY_PATH" >> /etc/environment
@@ -171,4 +135,3 @@ RUN echo "curl http://localhost/ocitest.php"
 
 EXPOSE 80
 EXPOSE 443
->>>>>>> origin/php74
