@@ -1,6 +1,7 @@
 FROM php:7.4-apache
 
 RUN apt-get update && apt-get install -y \
+        wget \
         unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -17,12 +18,7 @@ RUN apt-get update && apt-get install -y \
         libmemcached-dev \
         build-essential \
         libaio1 \
-        libzip-dev 
-    #&& docker-php-ext-install zip \
-    #&& docker-php-ext-install zip \
-    #&& docker-php-ext-install -j$(nproc) iconv gettext \
-    #&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    #&& docker-php-ext-install -j$(nproc) gd
+        libzip-dev
 
 # Install zip
 RUN apt-get update && \
@@ -33,6 +29,19 @@ RUN apt-get update && \
 	#&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
 	#&& docker-php-ext-install -j$(nproc) gd
 
+RUN docker-php-ext-install zip \
+    && docker-php-ext-install zip
+
+#RUN docker-php-ext-install -j$(nproc) iconv gettext \
+#RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+#    && docker-php-ext-install -j$(nproc) gd
+
+#RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+#    && docker-php-ext-install gd  
+
+# RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
+     && docker-php-ext-install gd  
 
 COPY docker-php.conf /etc/apache2/conf-enabled/docker-php.conf
 
@@ -75,20 +84,22 @@ RUN a2enmod rewrite
 
 ARG INSTALL_LDAP=true
 
+# RUN a2enmod ldap
+
 RUN if [ ${INSTALL_LDAP} = true ]; then \
     apt-get install -y libldap2-dev && \
     docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
     docker-php-ext-install ldap \
 ;fi
 
-# RUN a2enmod ldap
-
 # Oracle instantclient
+#ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip /tmp/
+#ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip /tmp/
+#ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip /tmp/
 
-# Oracle instantclient
-ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip /tmp/
-ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip /tmp/
-ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip /tmp/
+RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip -P /tmp/
+RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip -P /tmp/
+RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip -P /tmp/
 
 RUN mkdir /usr/lib/oracle
 RUN mkdir /usr/lib/oracle/21.1
@@ -121,6 +132,8 @@ RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8-2
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
+
+RUN php -m
 
 EXPOSE 80
 EXPOSE 443
