@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
         libjpeg62-turbo-dev \
         libpng-dev \
         libaio1 \
-	libfreetype6-dev \
         libssl-dev \
         libmcrypt-dev \
         zlib1g-dev \
@@ -17,11 +16,6 @@ RUN apt-get update && apt-get install -y \
         curl \
         libmemcached-dev \
         build-essential \
-        libaio1 \
-        libzip-dev
-
-RUN apt-get update && \
-	apt-get install -y \
         libzip-dev
 
 RUN docker-php-ext-configure zip
@@ -34,10 +28,8 @@ COPY docker-php.conf /etc/apache2/conf-enabled/docker-php.conf
 
 RUN printf "log_errors = On \nerror_log = /dev/stderr\n" > /usr/local/etc/php/conf.d/php-logs.ini
 
-# Fix warnings
+# Configure Apache hostname and create self-signed SSL certificate
 RUN echo "ServerName localhost" >> /etc/apache2/conf-available/localhost.conf && a2enconf localhost \
-
-# Create self-signed SSL certificate
 		&& mkdir /etc/apache2/ssl \
 		&& openssl req \
 			-x509 \
@@ -47,12 +39,6 @@ RUN echo "ServerName localhost" >> /etc/apache2/conf-available/localhost.conf &&
 			-keyout /etc/apache2/ssl/apache2.key \
 			-out /etc/apache2/ssl/apache2.crt \
 			-subj "/CN=localhost" \
-
-# Remove packages to reduce image size
-#			&& apt-get purge openssl \
-#			&& apt-get autoremove --purge \
-
-# Install SSL certificate
 		&& sed -i -e "s|/etc/ssl/certs/ssl-cert-snakeoil.pem|/etc/apache2/ssl/apache2.crt|g" /etc/apache2/sites-available/default-ssl.conf \
 		&& sed -i -e "s|/etc/ssl/private/ssl-cert-snakeoil.key|/etc/apache2/ssl/apache2.key|g" /etc/apache2/sites-available/default-ssl.conf
 
@@ -60,10 +46,6 @@ RUN a2enmod ssl
 RUN a2ensite default-ssl
 
 RUN a2enmod rewrite
-
-# RUN apt-get update
-# RUN apt-get install -y php-ldap
-
 
 ###########################################################################
 # LDAP:
@@ -76,8 +58,6 @@ RUN if [ ${INSTALL_LDAP} = true ]; then \
     docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
     docker-php-ext-install ldap \
 ;fi
-
-# RUN a2enmod ldap
 
 # Oracle instantclient
 ADD ./instantclient/12.2.0.1.0/instantclient-basic-linux.x64-12.2.0.1.0.zip /tmp/
@@ -95,13 +75,11 @@ RUN ln -s /usr/local/instantclient_12_2/sqlplus /usr/bin/sqlplus
 
 RUN LD_LIBRARY_PATH=/usr/local/instantclient/ php
 
-RUN sh -c echo '/usr/local/instantclient' > /etc/ld.so.conf.d/oracle-instantclient
+RUN echo '/usr/local/instantclient' > /etc/ld.so.conf.d/oracle-instantclient
 
 RUN echo 'export ORACLE_HOME=/usr/local/instantclient' >> /root/.bashrc
 RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"' >> /root/.bashrc
 RUN echo 'umask 002' >> /root/.bashrc
-
-#RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"'
 
 RUN echo "LD_LIBRARY_PATH=\"/usr/local/instantclient\"" >> /etc/environment \
     && echo "ORACLE_HOME=\"/usr/local/instantclient\"" >> /etc/environment
@@ -128,15 +106,8 @@ RUN echo "LD_LIBRARY_PATH=/usr/local/instantclient:\$LD_LIBRARY_PATH" >> /etc/en
 RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
 RUN echo "<?php echo 'Oracle Instant Client installed. OCI8 extension needs manual installation.'; ?>" > /var/www/html/ocitest.php
 
-RUN echo "service apache2 restart"
-
 RUN php -v
-
 RUN ldconfig -v
-
-RUN echo "curl http://localhost/phpinfo.php"
-RUN echo "curl http://localhost/ocitest.php"
-
 RUN php -m
 
 EXPOSE 80
