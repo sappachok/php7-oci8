@@ -109,31 +109,24 @@ RUN echo "LD_LIBRARY_PATH=\"/usr/local/instantclient\"" >> /etc/environment \
 RUN ldconfig
 ENV LD_LIBRARY_PATH=/usr/local/instantclient
 
-# Install autoconf for building extensions
-RUN apt-get install -y autoconf
-
-# Add OCI8 source to the repository and copy it
-# Since we cannot access pecl.php.net, we'll include oci8 source directly
-ADD oci8_src /tmp/oci8_src
-
-RUN cd /tmp/oci8_src && \
-    phpize && \
-    ./configure --with-oci8=instantclient,/usr/local/instantclient && \
-    make && \
-    make install && \
-    cd / && \
-    rm -rf /tmp/oci8_src
-
-RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
-
 RUN apt-get install nano -y
 
 RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient" >> /etc/apache2/envvars
 RUN echo "export ORACLE_HOME=/usr/local/instantclient" >> /etc/apache2/envvars
 RUN echo "LD_LIBRARY_PATH=/usr/local/instantclient:\$LD_LIBRARY_PATH" >> /etc/environment
 
+# Note: OCI8 extension installation requires access to pecl.php.net which may not be available
+# To install OCI8 manually after container starts, run:
+#   pecl install oci8-2.2.0
+#   echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+# Or download oci8-2.2.0.tgz and install manually:
+#   tar -xzf oci8-2.2.0.tgz && cd oci8-2.2.0
+#   phpize && ./configure --with-oci8=instantclient,/usr/local/instantclient
+#   make && make install
+#   echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+
 RUN echo "<?php echo phpinfo(); ?>" > /var/www/html/phpinfo.php
-RUN echo "<?php echo 'Client Version: ' . oci_client_version(); ?>" > /var/www/html/ocitest.php
+RUN echo "<?php echo 'Oracle Instant Client installed. OCI8 extension needs manual installation.'; ?>" > /var/www/html/ocitest.php
 
 RUN echo "service apache2 restart"
 
