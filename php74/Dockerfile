@@ -1,15 +1,29 @@
 FROM php:7.4-apache
 
-RUN apt-get update && apt-get install -y \
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Configure archived Debian repositories
+RUN . /etc/os-release && \
+    if [ "$VERSION_CODENAME" = "bullseye" ]; then \
+        printf '%s\n' \
+          'deb http://archive.debian.org/debian bullseye main' \
+          'deb http://archive.debian.org/debian-security bullseye-security main' \
+          > /etc/apt/sources.list && \
+        rm -f /etc/apt/sources.list.d/*.list && \
+        printf 'Acquire::Check-Valid-Until "false";\n' \
+          > /etc/apt/apt.conf.d/99archive; \
+    fi
+
+# Install required packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         wget \
         unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
         libaio1 \
-	libfreetype6-dev \
         libssl-dev \
-        libmcrypt-dev \
         zlib1g-dev \
         libxml2-dev \
         libonig-dev \
@@ -17,29 +31,15 @@ RUN apt-get update && apt-get install -y \
         curl \
         libmemcached-dev \
         build-essential \
-        libaio1 \
-        libzip-dev
+        libzip-dev \
+        libldap2-dev \
+        openssl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install zip
-RUN apt-get update && \
-	apt-get install -y \
-        libzip-dev
-        #&& docker-php-ext-install zip \
-	#&& docker-php-ext-install -j$(nproc) iconv gettext \
-	#&& docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-	#&& docker-php-ext-install -j$(nproc) gd
+RUN docker-php-ext-install zip \
+   && docker-php-ext-install zip
 
-RUN docker-php-ext-configure zip
-RUN docker-php-ext-install zip
-
-#RUN docker-php-ext-install -j$(nproc) iconv gettext \
-#RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-#    && docker-php-ext-install -j$(nproc) gd
-
-#RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-#    && docker-php-ext-install gd  
-
-# RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
      && docker-php-ext-install gd  
 
@@ -92,10 +92,17 @@ RUN if [ ${INSTALL_LDAP} = true ]; then \
     docker-php-ext-install ldap \
 ;fi
 
-# Oracle instantclient
-#ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip /tmp/
-#ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip /tmp/
-#ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip /tmp/
+RUN docker-php-ext-install gettext
+
+#RUN pecl install redis-5.3.7 \
+#    && docker-php-ext-enable redis
+
+RUN if pecl list | grep -q '^redis '; then \
+        pecl uninstall redis; \
+    fi \
+    && pecl install redis-5.3.7 \
+    && docker-php-ext-enable redis \
+    && php -r 'exit(class_exists("Redis") ? 0 : 1);'  
 
 RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip -P /tmp/
 RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip -P /tmp/
