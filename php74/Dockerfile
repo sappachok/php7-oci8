@@ -86,11 +86,11 @@ ARG INSTALL_LDAP=true
 
 # RUN a2enmod ldap
 
-RUN if [ ${INSTALL_LDAP} = true ]; then \
-    apt-get install -y libldap2-dev && \
-    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
-    docker-php-ext-install ldap \
-;fi
+RUN if [ "$INSTALL_LDAP" = "true" ]; then \
+        docker-php-ext-configure ldap \
+            --with-libdir=lib/x86_64-linux-gnu/ && \
+        docker-php-ext-install ldap; \
+    fi
 
 RUN docker-php-ext-install gettext
 
@@ -103,6 +103,11 @@ RUN if pecl list | grep -q '^redis '; then \
     && pecl install redis-5.3.7 \
     && docker-php-ext-enable redis \
     && php -r 'exit(class_exists("Redis") ? 0 : 1);'  
+    
+# Oracle instantclient
+#ADD ./instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip /tmp/
+#ADD ./instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip /tmp/
+#ADD ./instantclient/21.1.0.0.0/instantclient-sqlplus-linux.x64-21.1.0.0.0.zip /tmp/
 
 RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-basic-linux.x64-21.1.0.0.0.zip -P /tmp/
 RUN wget https://github.com/sappachok/php7-oci8/raw/master/instantclient/21.1.0.0.0/instantclient-sdk-linux.x64-21.1.0.0.0.zip -P /tmp/
@@ -132,10 +137,15 @@ RUN echo /usr/lib/oracle/21.1/client64/lib > /etc/ld.so.conf.d/oracle.conf
 
 RUN ldconfig
 
-RUN pecl channel-update pecl.php.net
+#RUN pecl channel-update pecl.php.net
 
 #RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8
-RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8-2.2.0
+#RUN echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' | pecl install oci8-2.2.0
+
+RUN pecl channel-update pecl.php.net \
+    && echo 'instantclient,/usr/lib/oracle/21.1/client64/lib' \
+       | pecl install oci8-2.2.0 \
+    && docker-php-ext-enable oci8
 
 RUN echo "curl http://localhost/phpinfo.php"
 RUN echo "curl http://localhost/ocitest.php"
